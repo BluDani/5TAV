@@ -5,11 +5,11 @@ from time import sleep
 def exibirTabuleiro(tabuleiro):
 
     print("\n")
-    print(f"\t {tabuleiro[0][0]} | {tabuleiro[0][1]} | {tabuleiro[0][2]}")
-    print("\t--------")
-    print(f"\t {tabuleiro[1][0]} | {tabuleiro[1][1]} | {tabuleiro[1][2]}")
-    print("\t--------")
-    print(f"\t {tabuleiro[2][0]} | {tabuleiro[2][1]} | {tabuleiro[2][2]}")
+    print(f"\t  {tabuleiro[0][0]}  |  {tabuleiro[0][1]}  |  {tabuleiro[0][2]} ")
+    print("\t--------------")
+    print(f"\t  {tabuleiro[1][0]}  |  {tabuleiro[1][1]}  |  {tabuleiro[1][2]} ")
+    print("\t--------------")
+    print(f"\t  {tabuleiro[2][0]}  |  {tabuleiro[2][1]}  |  {tabuleiro[2][2]} ")
 
 
 def menu():
@@ -108,6 +108,8 @@ def maquina(tabuleiro, cont):
     #Caso a jogada seja inválida, retorna false
     return False
 
+#def maquinaEsperta(tabuleiro, cont):
+    
 
 def verificaGanhador(tabuleiro):
 
@@ -147,11 +149,45 @@ tabuleiro = [["", "", ""],
 
 contador = []
 ganhador = 0
+quemComeca = 0
 
 
 menu()
 
 modoJogo = int(input("\nEscolha o modo de jogo: "))
+
+quemComeca = random.randint(1, 2)
+
+if(quemComeca == 2 and modoJogo == 2):
+
+    exibirTabuleiro(tabuleiro)
+
+    #O jogador2 só sai do looping se fizer uma jogada válida
+    while True:
+        jogador2 = jogador(tabuleiro, contador, 2, "O")
+
+        if(jogador2):
+            break
+
+if(quemComeca == 2 and modoJogo == 1):
+
+    exibirTabuleiro(tabuleiro)
+
+    #vez do computador
+    print("\nJogada do computador ", end="")
+    
+    #só fazendo uma graça pra deixar bonitinho
+    for c in range(0, 3):
+
+        sleep(1)
+        print(".", end="", flush=True)
+
+    #A maquina só sai do looping se fizer uma jogada válida
+    while True:
+        computador= maquina(tabuleiro, contador)
+
+        if(computador):
+            break
 
 
 while True:
@@ -160,7 +196,7 @@ while True:
 
     
     #Verifica se o contador não chegou no limite
-    if(len(contador) < 9):
+    if(ganhador == 0 and len(contador) < 9):
 
         #O jogador1 só sai do looping se fizer uma jogada válida
         while True:
