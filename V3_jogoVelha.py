@@ -90,31 +90,42 @@ def maquina(tabuleiro, jogada, simbolo="O"):
 
 # Função para verificar se há uma vitória no tabuleiro
 def verificar_vitoria(tabuleiro, simbolo):
-    vitorias = [(0, 1, 2), (3, 4, 5), (6, 7, 8),  # Linhas
-                (0, 3, 6), (1, 4, 7), (2, 5, 8),  # Colunas
-                (0, 4, 8), (2, 4, 6)]  # Diagonais
 
-    return any(tabuleiro[a] == tabuleiro[b] == tabuleiro[c] == simbolo for a, b, c in vitorias)
+    vitorias = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Linhas
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Colunas
+        [0, 4, 8], [2, 4, 6]  # Diagonais
+    ]
+
+    for linha in vitorias:
+
+        if tabuleiro[linha[0]] == simbolo and tabuleiro[linha[1]] == simbolo and tabuleiro[linha[2]] == simbolo:
+            return True
+        
+    return False
 
 
 # Função para encontrar a melhor jogada (ganhar ou bloquear o adversário)
 def melhor_jogada(tabuleiro, simbolo, oponente):
+
     for i in range(9):
 
-        if (tabuleiro[i] == ""):  # Verifica as posições vazias
+        if tabuleiro[i] == "":
 
-            # Testar a vitória do computador
+            # Testa a vitória do computador
             tabuleiro[i] = simbolo
 
-            if (verificar_vitoria(tabuleiro, simbolo)):
+            if verificar_vitoria(tabuleiro, simbolo):
                 return i
-
-            # Testar o bloqueio da vitória do adversário
+            
+            # Testa o bloqueio do jogador
             tabuleiro[i] = oponente
-            if (verificar_vitoria(tabuleiro, oponente)):
-                return i
 
+            if verificar_vitoria(tabuleiro, oponente):
+                return i
+            
             tabuleiro[i] = ""  # Reseta a posição
+            
     return None
 
 def verificaPossibilidade(t,verificacao):
@@ -140,36 +151,39 @@ def verificaPossibilidade(t,verificacao):
 
     return possibilidades
 
-def verificaArmadilha(t,verificacao):
+def verificaArmadilha(t, verificacao):
+    linha2 = [0] * 3  # Inicializa uma linha de 3 posições para verificar possíveis armadilhas
+    possibilidades = [0] * 3  # Inicializa lista de possibilidades
 
-    linha2 = [0]*3
-    possibilidades=[0]*3
+    # Verifica as possibilidades com a função verificaPossibilidade
+    linha1 = verificaPossibilidade(t, verificacao)
 
-    linha1 = verificaPossibilidade(t,verificacao)
-    
-    if(t[0]+t[1]+t[2] == verificacao): 
-        linha2 = [0,1,2]
-    if(t[3]+t[4]+t[5] == verificacao):
-        linha2 = [3,4,5]
-    if(t[6]+t[7]+t[8]== verificacao):
-        linha2 = [6,7,8]
-    if(t[0]+t[3]+t[6]== verificacao):
-        linha2 = [0,3,6]
-    if(t[1]+t[4]+t[7]== verificacao):
-        linha2 = [1,4,7]
-    if(t[2]+t[5]+t[8]== verificacao):
-        linha2 = [2,5,8]
-    if(t[0]+t[4]+t[8]== verificacao):
-        linha2 = [0,4,8]
-    if(t[2]+t[4]+t[6]== verificacao):
-        linha2 = [2,4,6]
+    # Verifica as diferentes linhas no tabuleiro que podem formar uma armadilha
+    if t[1] + t[2] + t[3] == verificacao:
+        linha2 = [1, 2, 3]
+    if t[4] + t[5] + t[6] == verificacao:
+        linha2 = [4, 5, 6]
+    if t[7] + t[8] + t[9] == verificacao:
+        linha2 = [7, 8, 9]
+    if t[1] + t[4] + t[7] == verificacao:
+        linha2 = [1, 4, 7]
+    if t[2] + t[5] + t[8] == verificacao:
+        linha2 = [2, 5, 8]
+    if t[3] + t[6] + t[9] == verificacao:
+        linha2 = [3, 6, 9]
+    if t[1] + t[5] + t[9] == verificacao:
+        linha2 = [1, 5, 9]
+    if t[3] + t[5] + t[7] == verificacao:
+        linha2 = [3, 5, 7]
 
-    possibilidades = set(linha1) & set(linha2) # set() transforma a lista em conjuto, & verifica a intersecção dos 2 conjuntos
+    # Verifica a interseção entre as duas listas (linha1 e linha2) usando conjuntos
+    possibilidades = set(linha1) & set(linha2)
 
-    possibilidades = list(possibilidades) # list() transforma o conjunto em lista
-    possibilidades.append(0) # append() adiciona um elemento no final da lista
+    # Converte o conjunto de volta para uma lista e adiciona zeros para manter a estrutura
+    possibilidades = list(possibilidades)
     possibilidades.append(0)
-    
+    possibilidades.append(0)
+
     return possibilidades
 
 def prever_armadilha(tabuleiro, simbolo, oponente):
@@ -182,6 +196,147 @@ def prever_armadilha(tabuleiro, simbolo, oponente):
             return pos  # Bloqueia a armadilha do oponente
 
     return None
+
+def possibilidades(tabuleiro, simbolo, oponente):
+
+    # Primeira linha
+    if(tabuleiro[0] == tabuleiro[1] == simbolo and tabuleiro[2] == ""):
+        return 2
+    elif(tabuleiro[0] == tabuleiro[2] == simbolo and tabuleiro[1] == ""):
+        return 1
+    elif(tabuleiro[1] == tabuleiro[2] == simbolo and tabuleiro[0] == ""):
+        return 0
+
+    # Segunda linha
+    elif(tabuleiro[3] == tabuleiro[4] == simbolo and tabuleiro[5] == ""):
+        return 5
+    elif(tabuleiro[3] == tabuleiro[5] == simbolo and tabuleiro[4] == ""):
+        return 4
+    elif(tabuleiro[4] == tabuleiro[5] == simbolo and tabuleiro[3] == ""):
+        return 3
+
+    # Terceira linha
+    elif(tabuleiro[6] == tabuleiro[7] == simbolo and tabuleiro[8] == ""):
+        return 8
+    elif(tabuleiro[6] == tabuleiro[8] == simbolo and tabuleiro[7] == ""):
+        return 7
+    elif(tabuleiro[7] == tabuleiro[8] == simbolo and tabuleiro[6] == ""):
+        return 6
+
+    # Primeira coluna
+    elif(tabuleiro[0] == tabuleiro[3] == simbolo and tabuleiro[6] == ""):
+        return 6
+    elif(tabuleiro[0] == tabuleiro[6] == simbolo and tabuleiro[3] == ""):
+        return 3
+    elif(tabuleiro[3] == tabuleiro[6] == simbolo and tabuleiro[0] == ""):
+        return 0
+
+    # Segunda coluna
+    elif(tabuleiro[1] == tabuleiro[4] == simbolo and tabuleiro[7] == ""):
+        return 7
+    elif(tabuleiro[1] == tabuleiro[7] == simbolo and tabuleiro[4] == ""):
+        return 4
+    elif(tabuleiro[4] == tabuleiro[7] == simbolo and tabuleiro[1] == ""):
+        return 1
+
+    # Terceira coluna
+    elif(tabuleiro[2] == tabuleiro[5] == simbolo and tabuleiro[8] == ""):
+        return 8
+    elif(tabuleiro[2] == tabuleiro[8] == simbolo and tabuleiro[5] == ""):
+        return 5
+    elif(tabuleiro[5] == tabuleiro[8] == simbolo and tabuleiro[2] == ""):
+        return 2
+
+    # Primeira diagonal
+    elif(tabuleiro[0] == tabuleiro[4] == simbolo and tabuleiro[8] == ""):
+        return 8
+    elif(tabuleiro[0] == tabuleiro[8] == simbolo and tabuleiro[4] == ""):
+        return 4
+    elif(tabuleiro[4] == tabuleiro[8] == simbolo and tabuleiro[0] == ""):
+        return 0
+
+    # Segunda diagonal
+    elif(tabuleiro[2] == tabuleiro[4] == simbolo and tabuleiro[6] == ""):
+        return 6
+    elif(tabuleiro[2] == tabuleiro[6] == simbolo and tabuleiro[4] == ""):
+        return 4
+    elif(tabuleiro[4] == tabuleiro[6] == simbolo and tabuleiro[2] == ""):
+        return 2
+
+
+    #bloquear oponente
+
+    # Primeira linha
+    if(tabuleiro[0] == tabuleiro[1] == oponente and tabuleiro[2] == ""):
+        return 2
+    elif(tabuleiro[0] == tabuleiro[2] == oponente and tabuleiro[1] == ""):
+        return 1
+    elif(tabuleiro[1] == tabuleiro[2] == oponente and tabuleiro[0] == ""):
+        return 0
+
+    # Segunda linha
+    elif(tabuleiro[3] == tabuleiro[4] == oponente and tabuleiro[5] == ""):
+        return 5
+    elif(tabuleiro[3] == tabuleiro[5] == oponente and tabuleiro[4] == ""):
+        return 4
+    elif(tabuleiro[4] == tabuleiro[5] == oponente and tabuleiro[3] == ""):
+        return 3
+
+    # Terceira linha
+    elif(tabuleiro[6] == tabuleiro[7] == oponente and tabuleiro[8] == ""):
+        return 8
+    elif(tabuleiro[6] == tabuleiro[8] == oponente and tabuleiro[7] == ""):
+        return 7
+    elif(tabuleiro[7] == tabuleiro[8] == oponente and tabuleiro[6] == ""):
+        return 6
+
+    # Primeira coluna
+    elif(tabuleiro[0] == tabuleiro[3] == oponente and tabuleiro[6] == ""):
+        return 6
+    elif(tabuleiro[0] == tabuleiro[6] == oponente and tabuleiro[3] == ""):
+        return 3
+    elif(tabuleiro[3] == tabuleiro[6] == oponente and tabuleiro[0] == ""):
+        return 0
+
+    # Segunda coluna
+    elif(tabuleiro[1] == tabuleiro[4] == oponente and tabuleiro[7] == ""):
+        return 7
+    elif(tabuleiro[1] == tabuleiro[7] == oponente and tabuleiro[4] == ""):
+        return 4
+    elif(tabuleiro[4] == tabuleiro[7] == oponente and tabuleiro[1] == ""):
+        return 1
+
+    # Terceira coluna
+    elif(tabuleiro[2] == tabuleiro[5] == oponente and tabuleiro[8] == ""):
+        return 8
+    elif(tabuleiro[2] == tabuleiro[8] == oponente and tabuleiro[5] == ""):
+        return 5
+    elif(tabuleiro[5] == tabuleiro[8] == oponente and tabuleiro[2] == ""):
+        return 2
+
+    # Primeira diagonal
+    elif(tabuleiro[0] == tabuleiro[4] == oponente and tabuleiro[8] == ""):
+        return 8
+    elif(tabuleiro[0] == tabuleiro[8] == oponente and tabuleiro[4] == ""):
+        return 4
+    elif(tabuleiro[4] == tabuleiro[8] == oponente and tabuleiro[0] == ""):
+        return 0
+
+    # Segunda diagonal
+    elif(tabuleiro[2] == tabuleiro[4] == oponente and tabuleiro[6] == ""):
+        return 6
+    elif(tabuleiro[2] == tabuleiro[6] == oponente and tabuleiro[4] == ""):
+        return 4
+    elif(tabuleiro[4] == tabuleiro[6] == oponente and tabuleiro[2] == ""):
+        return 2
+
+    else:
+
+        return -1
+
+
+
+
 
 def maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X"):
     # Maquina profissional começa
@@ -217,7 +372,9 @@ def maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X"):
         if (len(jogada) == 4):
 
             if (jogada[1] == 0):
+
                 if (jogada[3] == 5):
+
                     tabuleiro[6] = simbolo
                     jogada.append(6)
 
@@ -456,102 +613,193 @@ def maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X"):
                         tabuleiro[1] = simbolo
                         jogada.append(1)
 
-            # Oitava rodada
-            if (len(jogada) == 8):
+        # Oitava rodada
+        if (len(jogada) == 8):
 
-                if (jogada[3] == 3):
+            if (jogada[3] == 3):
 
-                    if (jogada[5] == 8):
+                if (jogada[5] == 8):
 
-                        if (jogada[7] == 1):
+                    if (jogada[7] == 1):
 
-                            tabuleiro[6] = simbolo
-                            jogada.append(6)
+                        tabuleiro[6] = simbolo
+                        jogada.append(6)
 
-                        else:
-                            tabuleiro[1] = simbolo
-                            jogada.append(1)
+                    else:
+                        tabuleiro[1] = simbolo
+                        jogada.append(1)
 
-                elif (jogada[3] == 5):
+            elif (jogada[3] == 5):
 
-                    if (jogada[5] == 0):
+                if (jogada[5] == 0):
 
-                        if (jogada[7] == 6):
+                    if (jogada[7] == 6):
 
-                            tabuleiro[1] = simbolo
-                            jogada.append(1)
+                        tabuleiro[1] = simbolo
+                        jogada.append(1)
 
-                        else:
-                            tabuleiro[6] = simbolo
-                            jogada.append(6)
+                    else:
+                        tabuleiro[6] = simbolo
+                        jogada.append(6)
 
-                    elif (jogada[5] == 1):
+                elif (jogada[5] == 1):
 
-                        compt = maquina(tabuleiro,jogada, simbolo)
+                    if(jogada[7] == 0):
 
-                        if(jogada[7] == 0):
+                        tabuleiro[8] = simbolo
+                        jogada.append(8)
 
-                            tabuleiro[8] = simbolo
-                            jogada.append(8)
+                    else:
+                        tabuleiro[0] = simbolo
+                        jogada.append(0)
+                        
 
-                        else:
-                            tabuleiro[0] = simbolo
-                            jogada.append(0)
-                            
+                elif (jogada[5] == 6 or jogada[5] == 8):
 
-                    elif (jogada[5] == 6 or jogada[5] == 8):
+                    if (jogada[7] == 1):
+                        tabuleiro[8] = simbolo
+                        jogada.append(8)
 
-                        if (jogada[7] == 1):
-                            tabuleiro[8] = simbolo
-                            jogada.append(8)
+                    else:
+                        tabuleiro[1] = simbolo
+                        jogada.append(1)
 
-                        else:
-                            tabuleiro[1] = simbolo
-                            jogada.append(1)
+            elif (jogada[3] == 6 or jogada[3] == 8):
 
-                elif (jogada[3] == 6 or jogada[3] == 8):
+                if (jogada[5] == 1):
 
-                    if (jogada[5] == 1):
+                    if (jogada[7] == 8):
+                        tabuleiro[3] = simbolo
+                        jogada.append(3)
 
-                        if (jogada[7] == 8):
-                            tabuleiro[3] = simbolo
-                            jogada.append(3)
-
-                        else:
-                            tabuleiro[8] = simbolo
-                            jogada.append(8)
+                    else:
+                        tabuleiro[8] = simbolo
+                        jogada.append(8)
 
     else:
 
-        # Definir símbolo do oponente
-        oponente = "O" if simbolo == "X" else "X"
+        simbolo = "O"
 
-        # 1. Tentar ganhar ou bloquear o jogador
-        posicao = melhor_jogada(tabuleiro, simbolo, oponente)
+        #segunda jogada
+        if(len(jogada) == 1):
 
-        # 2. Se não houver jogada de bloqueio ou vitória, verificar possíveis armadilhas
-        if posicao is None:
-            posicao = prever_armadilha(tabuleiro, simbolo, oponente)
+            if(jogada[0] != 4):
 
-        # 3. Se não houver armadilha, escolha uma posição estratégica
-        if posicao is None:
-            # Prioriza o centro
-            if tabuleiro[4] == "":
-                posicao = 4
+                tabuleiro[4] = simbolo
+                jogada.append(4)
+
             else:
-                # Se o centro estiver ocupado, priorize os cantos
-                cantos = [0, 2, 6, 8]
-                posicao = next((pos for pos in cantos if tabuleiro[pos] == ""), None)
+                tabuleiro[2] = simbolo
+                jogada.append(2)
+        
+        #quarta jogada
+        elif(len(jogada) == 3):
 
-                # Se os cantos estiverem ocupados, priorize as bordas
-                if posicao is None:
-                    bordas = [1, 3, 5, 7]
-                    posicao = next((pos for pos in bordas if tabuleiro[pos] == ""), None)
+            posicao = possibilidades(tabuleiro, simbolo, "X")
 
-        # 4. Executa a jogada se encontrou uma posição válida
-        if posicao is not None:
-            tabuleiro[posicao] = simbolo
-            jogada.append(posicao)  # Armazena a jogada
+            if(posicao == -1):
+
+                if(jogada[0] == 4):
+
+                    if(jogada[2] == 6):
+
+                        tabuleiro[8] = simbolo
+                        jogada.append(8)
+
+                elif(jogada[0] == 0):
+
+                    if(jogada[2] == 3 or jogada[2] == 8):
+                        tabuleiro[7] = simbolo
+                        jogada.append(7)
+                    
+                    elif(jogada[2] == 7):
+                        tabuleiro[5] = simbolo
+                        jogada.append(5)
+
+                
+                elif(jogada[0] == 1):
+
+                    if(jogada[2] == 3 or jogada[2] == 6 or jogada[2] == 7):
+                        tabuleiro[0] = simbolo
+                        jogada.append(0)
+
+                    elif(jogada[2] == 5 or jogada[2] == 8):
+                        tabuleiro[2] = simbolo
+                        jogada.append(2)
+
+                elif(jogada[0] == 2):
+
+                    if(jogada[2] == 3 or jogada[2] == 6):
+                        tabuleiro[1] = simbolo
+                        jogada.append(1)
+                    
+                    elif(jogada[2] == 7):
+                        tabuleiro[3] = simbolo
+                        jogada.append(3)
+
+                elif(jogada[0] == 3):
+
+                    if(jogada[2] == 1 or jogada[2] == 2 or jogada[2] == 5):
+                        tabuleiro[0] = simbolo
+                        jogada.append(0)
+
+                    elif(jogada[2] == 7 or jogada[2] == 8):
+                        tabuleiro[6] = simbolo
+                        jogada.append(6)
+
+
+                elif(jogada[0] == 5):
+                    if(jogada[2] == 0 or jogada[2] == 1 or jogada[2] == 3):
+                        tabuleiro[2] = simbolo
+                        jogada.append(2)
+
+                    elif(jogada[2] == 6 or jogada[2] == 7):
+                        tabuleiro[8] = simbolo
+                        jogada.append(8)
+
+                elif(jogada[0] == 6):
+                    if(jogada[2] == 2 or jogada[2] == 5):
+                        tabuleiro[1] = simbolo
+                        jogada.append(1)
+
+                    elif(jogada[2] == 1):
+                        tabuleiro[5] = simbolo
+                        jogada.append(5)
+
+                elif(jogada[0] == 7):
+                    if(jogada[2] == 0 or jogada[2] == 1 or jogada[2] == 3):
+                        tabuleiro[6] = simbolo
+                        jogada.append(6)
+
+                    elif(jogada[2] == 2 or jogada[2] == 5):
+                        tabuleiro[8] = simbolo
+                        jogada.append(8)
+
+                elif(jogada[0] == 8):
+                    if(jogada[2] == 0 or jogada[2] == 3):
+                        tabuleiro[1] = simbolo
+                        jogada.append(1)
+
+                    elif(jogada[2] == 1):
+                        tabuleiro[3] = simbolo
+                        jogada.append(3)
+
+            else:
+                tabuleiro[posicao] = simbolo
+                jogada.append(posicao)
+
+        #sexta jogada
+        #elif(len(jogada) == 5):
+
+
+        #oitava jogada
+        #elif(len(jogada) == 7):
+
+                        
+
+
+
+
 
 
 def verificaGanhador(tabuleiro):
@@ -601,7 +849,7 @@ while True:
 
     if (modoJogo != 4):
 
-        quemComeca = random.randint(1, 2)  # Randomizar quem começa
+        quemComeca = 1 #random.randint(1, 2)  # Randomizar quem começa
 
         # Jogador 2 começando
         if (quemComeca == 2 and modoJogo == 2):
@@ -681,6 +929,15 @@ while True:
 
             # Modo de jogo 3: Contra o Computador Profissional
             if (modoJogo == 3 and ganhador == 0 and len(jogada) < 9):
+
+                # Vez do computador
+                print("\nJogada do computador ", end="")
+
+                # Só fazendo uma graça pra deixar bonitinho
+                for c in range(0, 3):
+                    sleep(1)
+                    print(".", end="", flush=True)
+
                 maquinaProf(tabuleiro, jogada, quemComeca, simbolo="O")
                 exibirTabuleiro(tabuleiro)
                 ganhador = verificaGanhador(tabuleiro)
@@ -857,6 +1114,7 @@ while True:
 
                     elif (ganhador == 2):
                         resultados[1] += 1
+                        break
 
                     else:
                         resultados[2] += 1
