@@ -1,7 +1,7 @@
 import random
 from time import sleep
-#import pandas as pd # para salvar os resultados em um arquivo xlsx 
-#tem que executar o "pip install openpyxl" para o xlsx
+import pandas as pd # para salvar os resultados em um arquivo xlsx tem que executar o "pip install openpyxl" para o xlsx
+import matplotlib.pyplot as plt # para exibir um grafico , executar o "pip install matplotlib"
 
 
 # Função para exibir o tabuleiro com uma lista simples de 9 posições
@@ -87,115 +87,6 @@ def maquina(tabuleiro, jogada, simbolo="O"):
             jogada.append(maquina_pos)
             return True
 
-
-# Função para verificar se há uma vitória no tabuleiro
-def verificar_vitoria(tabuleiro, simbolo):
-
-    vitorias = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Linhas
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Colunas
-        [0, 4, 8], [2, 4, 6]  # Diagonais
-    ]
-
-    for linha in vitorias:
-
-        if tabuleiro[linha[0]] == simbolo and tabuleiro[linha[1]] == simbolo and tabuleiro[linha[2]] == simbolo:
-            return True
-        
-    return False
-
-
-# Função para encontrar a melhor jogada (ganhar ou bloquear o adversário)
-def melhor_jogada(tabuleiro, simbolo, oponente):
-
-    for i in range(9):
-
-        if tabuleiro[i] == "":
-
-            # Testa a vitória do computador
-            tabuleiro[i] = simbolo
-
-            if verificar_vitoria(tabuleiro, simbolo):
-                return i
-            
-            # Testa o bloqueio do jogador
-            tabuleiro[i] = oponente
-
-            if verificar_vitoria(tabuleiro, oponente):
-                return i
-            
-            tabuleiro[i] = ""  # Reseta a posição
-            
-    return None
-
-def verificaPossibilidade(t,verificacao):
-
-    possibilidades=[0]*3
-    
-    if(t[0]+t[1]+t[2] == verificacao): 
-        possibilidades = [0,1,2]
-    elif(t[3]+t[4]+t[5] == verificacao):
-        possibilidades = [3,4,5]
-    elif(t[6]+t[7]+t[8]== verificacao):
-        possibilidades = [6,7,8]
-    elif(t[0]+t[3]+t[6]== verificacao):
-        possibilidades = [0,3,6]
-    elif(t[1]+t[4]+t[7]== verificacao):
-        possibilidades = [1,4,7]
-    elif(t[2]+t[5]+t[8]== verificacao):
-        possibilidades = [2,5,8]
-    elif(t[0]+t[4]+t[8]== verificacao):
-        possibilidades = [0,4,8]
-    elif(t[2]+t[4]+t[6]== verificacao):
-        possibilidades = [2,4,6]
-
-    return possibilidades
-
-def verificaArmadilha(t, verificacao):
-    linha2 = [0] * 3  # Inicializa uma linha de 3 posições para verificar possíveis armadilhas
-    possibilidades = [0] * 3  # Inicializa lista de possibilidades
-
-    # Verifica as possibilidades com a função verificaPossibilidade
-    linha1 = verificaPossibilidade(t, verificacao)
-
-    # Verifica as diferentes linhas no tabuleiro que podem formar uma armadilha
-    if t[1] + t[2] + t[3] == verificacao:
-        linha2 = [1, 2, 3]
-    if t[4] + t[5] + t[6] == verificacao:
-        linha2 = [4, 5, 6]
-    if t[7] + t[8] + t[9] == verificacao:
-        linha2 = [7, 8, 9]
-    if t[1] + t[4] + t[7] == verificacao:
-        linha2 = [1, 4, 7]
-    if t[2] + t[5] + t[8] == verificacao:
-        linha2 = [2, 5, 8]
-    if t[3] + t[6] + t[9] == verificacao:
-        linha2 = [3, 6, 9]
-    if t[1] + t[5] + t[9] == verificacao:
-        linha2 = [1, 5, 9]
-    if t[3] + t[5] + t[7] == verificacao:
-        linha2 = [3, 5, 7]
-
-    # Verifica a interseção entre as duas listas (linha1 e linha2) usando conjuntos
-    possibilidades = set(linha1) & set(linha2)
-
-    # Converte o conjunto de volta para uma lista e adiciona zeros para manter a estrutura
-    possibilidades = list(possibilidades)
-    possibilidades.append(0)
-    possibilidades.append(0)
-
-    return possibilidades
-
-def prever_armadilha(tabuleiro, simbolo, oponente):
-    # Verifica se o oponente tem uma armadilha que precisa ser bloqueada
-    armadilha = verificaArmadilha(tabuleiro, oponente)  # Verifica onde o oponente pode formar uma armadilha
-
-    # Se encontrar uma armadilha, retorna a posição onde deve bloquear
-    for pos in armadilha:
-        if tabuleiro[pos] == "":
-            return pos  # Bloqueia a armadilha do oponente
-
-    return None
 
 def possibilidades(tabuleiro, simbolo, oponente):
 
@@ -333,9 +224,6 @@ def possibilidades(tabuleiro, simbolo, oponente):
     else:
 
         return -1
-
-
-
 
 
 def maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X"):
@@ -678,109 +566,90 @@ def maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X"):
 
     else:
 
-        simbolo = "O"
-
-        #segunda jogada
-        if(len(jogada) == 1):
-
-            if(jogada[0] != 4):
-
+        # Segunda jogada
+        if len(jogada) == 1:
+            # Se a primeira jogada do oponente não for no centro, ocupar o centro
+            if jogada[0] != 4:
                 tabuleiro[4] = simbolo
                 jogada.append(4)
-
             else:
+                # Caso contrário, ocupar um canto
                 tabuleiro[2] = simbolo
                 jogada.append(2)
-        
-        #quarta jogada
-        elif(len(jogada) == 3):
 
+        # Quarta jogada
+        elif len(jogada) == 3:
+            # Verificar se há uma jogada para vencer ou bloquear
             posicao = possibilidades(tabuleiro, simbolo, "X")
 
-            if(posicao == -1):
-
-                if(jogada[0] == 4):
-
-                    if(jogada[2] == 6):
-
+            if posicao == -1:
+                # Caso não haja, jogar baseado na posição do oponente
+                if jogada[0] == 4:
+                    if jogada[2] == 6:
                         tabuleiro[8] = simbolo
                         jogada.append(8)
 
-                elif(jogada[0] == 0):
-
-                    if(jogada[2] == 3 or jogada[2] == 8):
+                elif jogada[0] == 0:
+                    if jogada[2] == 5 or jogada[2] == 8:
                         tabuleiro[7] = simbolo
                         jogada.append(7)
-                    
-                    elif(jogada[2] == 7):
+                    elif jogada[2] == 7:
                         tabuleiro[5] = simbolo
                         jogada.append(5)
 
-                
-                elif(jogada[0] == 1):
-
-                    if(jogada[2] == 3 or jogada[2] == 6 or jogada[2] == 7):
+                elif jogada[0] == 1:
+                    if jogada[2] == 3 or jogada[2] == 6 or jogada[2] == 7:
                         tabuleiro[0] = simbolo
                         jogada.append(0)
-
-                    elif(jogada[2] == 5 or jogada[2] == 8):
+                    elif jogada[2] == 5 or jogada[2] == 8:
                         tabuleiro[2] = simbolo
                         jogada.append(2)
 
-                elif(jogada[0] == 2):
-
-                    if(jogada[2] == 3 or jogada[2] == 6):
+                elif jogada[0] == 2:
+                    if jogada[2] == 3 or jogada[2] == 6:
                         tabuleiro[1] = simbolo
                         jogada.append(1)
-                    
-                    elif(jogada[2] == 7):
+                    elif jogada[2] == 7:
                         tabuleiro[3] = simbolo
                         jogada.append(3)
 
-                elif(jogada[0] == 3):
-
-                    if(jogada[2] == 1 or jogada[2] == 2 or jogada[2] == 5):
+                elif jogada[0] == 3:
+                    if jogada[2] == 1 or jogada[2] == 2 or jogada[2] == 5:
                         tabuleiro[0] = simbolo
                         jogada.append(0)
-
-                    elif(jogada[2] == 7 or jogada[2] == 8):
+                    elif jogada[2] == 7 or jogada[2] == 8:
                         tabuleiro[6] = simbolo
                         jogada.append(6)
 
-
-                elif(jogada[0] == 5):
-                    if(jogada[2] == 0 or jogada[2] == 1 or jogada[2] == 3):
+                elif jogada[0] == 5:
+                    if jogada[2] == 0 or jogada[2] == 1 or jogada[2] == 3:
                         tabuleiro[2] = simbolo
                         jogada.append(2)
-
-                    elif(jogada[2] == 6 or jogada[2] == 7):
+                    elif jogada[2] == 6 or jogada[2] == 7:
                         tabuleiro[8] = simbolo
                         jogada.append(8)
 
-                elif(jogada[0] == 6):
-                    if(jogada[2] == 2 or jogada[2] == 5):
+                elif jogada[0] == 6:
+                    if jogada[2] == 2 or jogada[2] == 5:
                         tabuleiro[1] = simbolo
                         jogada.append(1)
-
-                    elif(jogada[2] == 1):
+                    elif jogada[2] == 1:
                         tabuleiro[5] = simbolo
                         jogada.append(5)
 
-                elif(jogada[0] == 7):
-                    if(jogada[2] == 0 or jogada[2] == 1 or jogada[2] == 3):
+                elif jogada[0] == 7:
+                    if jogada[2] == 0 or jogada[2] == 1 or jogada[2] == 3:
                         tabuleiro[6] = simbolo
                         jogada.append(6)
-
-                    elif(jogada[2] == 2 or jogada[2] == 5):
+                    elif jogada[2] == 2 or jogada[2] == 5:
                         tabuleiro[8] = simbolo
                         jogada.append(8)
 
-                elif(jogada[0] == 8):
-                    if(jogada[2] == 0 or jogada[2] == 3):
+                elif jogada[0] == 8:
+                    if jogada[2] == 0 or jogada[2] == 3:
                         tabuleiro[1] = simbolo
                         jogada.append(1)
-
-                    elif(jogada[2] == 1):
+                    elif jogada[2] == 1:
                         tabuleiro[3] = simbolo
                         jogada.append(3)
 
@@ -788,18 +657,52 @@ def maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X"):
                 tabuleiro[posicao] = simbolo
                 jogada.append(posicao)
 
-        #sexta jogada
-        #elif(len(jogada) == 5):
+        # Sexta jogada
+        elif len(jogada) == 5:
+            # Verificar se há uma jogada para vencer ou bloquear
+            posicao = possibilidades(tabuleiro, simbolo, "X")
+
+            if posicao != -1:
+                tabuleiro[posicao] = simbolo
+                jogada.append(posicao)
+            else:
+                # Se não houver posição de vitória ou bloqueio, jogar em uma posição estratégica
+                for i in [0, 2, 6, 8]:
+                    if tabuleiro[i] == "":
+                        tabuleiro[i] = simbolo
+                        jogada.append(i)
+                        break
+
+        # Oitava jogada
+        elif len(jogada) == 7:
+            # Verificar se há uma jogada para vencer ou bloquear
+            posicao = possibilidades(tabuleiro, simbolo, "X")
+
+            if posicao != -1:
+                tabuleiro[posicao] = simbolo
+                jogada.append(posicao)
+            else:
+                # Caso contrário, ocupar a última posição disponível
+                for i in range(9):
+                    if tabuleiro[i] == "":
+                        tabuleiro[i] = simbolo
+                        jogada.append(i)
+                        break
 
 
-        #oitava jogada
-        #elif(len(jogada) == 7):
+def mostrar_grafico_linhas(vitorias_jogador1, vitorias_jogador2, velhas, num_partidas):
+    partidas = list(range(1, num_partidas + 1))
 
-                        
+    plt.plot(partidas, vitorias_jogador1, label='Jogador 1', color='blue', marker='o')
+    plt.plot(partidas, vitorias_jogador2, label='Jogador 2', color='red', marker='o')
+    plt.plot(partidas, velhas, label='Velhas', color='gray', marker='o')
 
-
-
-
+    plt.xlabel('Número de Partidas')
+    plt.ylabel('Número de Vitórias/velhas')
+    plt.title('Evolução das Vitórias')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
 
 
 def verificaGanhador(tabuleiro):
@@ -839,6 +742,11 @@ ganhador = 0
 quantPartidas = 0  # quantidade de partidas que o simulador vai rodar
 quantRodadas = 0  # quantidade de rodadas do simulador
 resultados = [0, 0, 0]  # 1° jogador / 2° jogador 2 ou maquina boba / 3° maquina profissional
+salvar = ""
+
+dados = {
+    "modoJogo": ""
+}
 
 # Loop para saber se o jogador quer continuar
 while True:
@@ -906,6 +814,8 @@ while True:
 
         if (modoSimulacao == 2):
             quemComeca = int(input("\nQuem deve começar?\n1= Computador Aleatório\n2= Computador Profissional\n"))
+
+        salvar = str(input('\nQuer Salvar os dados em um arquivo excel e mostrar o grafico na tela [S/N]: ')).strip().upper()[0]
 
         quantPartidas = int(input("Quer simular quantas partidas: "))
 
@@ -1000,6 +910,11 @@ while True:
 
 
     else:
+
+        # Listas para gráficos
+        vitorias_jogador1 = []
+        vitorias_jogador2 = []
+        velhas = []
 
         if (modoSimulacao == 1):
 
@@ -1110,11 +1025,9 @@ while True:
 
                     if (ganhador == 1):
                         resultados[0] += 1
-                        break
 
                     elif (ganhador == 2):
                         resultados[1] += 1
-                        break
 
                     else:
                         resultados[2] += 1
@@ -1181,6 +1094,57 @@ while True:
             print("Computador Profissional 1 ganhou", resultados[0], "vez(es)")
             print("Computador Profissional 2 ganhou", resultados[1], "vez(es)")
             print("Deu Velha", resultados[2], "vez(es)")
+
+
+    if(salvar == "S"):
+        
+        dadosArquivos = []
+        vitorias_jogador1.append(resultados[0])
+        vitorias_jogador2.append(resultados[1])
+        velhas.append(resultados[2])
+
+        # Lista para armazenar os dados que serão salvos
+
+        # Definir o nome do arquivo com base nos bots
+        if(modoSimulacao == 1):
+            arquivo_excel = 'resultado_aleatorio_VS_aleatorio.xlsx'
+            jogador1 = 'Computador Aleatório 1'
+            jogador2 = 'Computador Aleatório 2'
+
+        elif(modoSimulacao == 2 and quemComeca == 1):
+            arquivo_excel = 'resultado_aleatorio_Comecando_VS_Profissional.xlsx'
+            jogador1 = 'Computador Aleatório'
+            jogador2 = 'Jogador Profissional'
+
+        elif(modoSimulacao == 2 and quemComeca == 2):
+            arquivo_excel = 'resultado_Profissional_Comecando_VS_aleatorio.xlsx'
+            jogador1 = 'Jogador Profissional'
+            jogador2 = 'Computador Aleatório'
+
+        elif(modoSimulacao == 3):
+            arquivo_excel = 'resultado_Profissional_VS_Profissional.xlsx'
+            jogador1 = 'Jogador Profissional 1'
+            jogador2 = 'Jogador Profissional 2'
+
+        # Adicionar os resultados no formato desejado
+        dadosArquivos.append({
+            'Jogador 1': jogador1,
+            'Vitorias Jogador 1': resultados[0],
+            'Jogador 2': jogador2,
+            'Vitorias Jogador 2': resultados[1],
+            'Velhas': resultados[2]
+        })
+
+        # Criar o DataFrame com colunas nomeadas
+        df_dadosArquivos = pd.DataFrame(dadosArquivos, columns=[
+            'Jogador 1', 'Vitorias Jogador 1', 'Jogador 2', 'Vitorias Jogador 2', 'Velhas'
+        ])
+
+        # Salvar o DataFrame no arquivo Excel
+        df_dadosArquivos.to_excel(arquivo_excel, index=False)
+
+        #mostrar_grafico_linhas(vitorias_jogador1, vitorias_jogador2, velhas, quantPartidas)
+
 
     continuar = str(input('\nQuer jogar novamente [S/N]: ')).strip().upper()[0]
 
