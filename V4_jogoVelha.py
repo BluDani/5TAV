@@ -54,7 +54,6 @@ def menuSimulacoes():
     print("3 - Computador Profissional VS Computador Profissional")
     print("=" * 56)
 
-
 # Função para exibir o menu de simulações do Agente Inteligente
 def menuAgenteI():
     print("\n")
@@ -64,7 +63,6 @@ def menuAgenteI():
     print("1 - Agente Inteligente VS Computador Aleatório")
     print("2 - Agente Inteligente VS Computador Profissional")
     print("=" * 56)
-
 
 # Função para a jogada de um jogador
 def jogador(tabuleiro, jogada, player=1, simbolo="X"):
@@ -244,6 +242,9 @@ def possibilidades(tabuleiro, simbolo, oponente):
 
 
 def maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X"):
+    
+    oponente = "O" if simbolo == "X" else "X"
+
     # Maquina profissional começa
     if (quemComeca == 2):
 
@@ -596,7 +597,7 @@ def maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X"):
         # Quarta jogada
         elif len(jogada) == 3:
             # Verificar se há uma jogada para vencer ou bloquear
-            posicao = possibilidades(tabuleiro, simbolo, "X")
+            posicao = possibilidades(tabuleiro, simbolo, oponente)
 
             if posicao == -1:
                 # Caso não haja, jogar baseado na posição do oponente
@@ -676,7 +677,7 @@ def maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X"):
         # Sexta jogada
         elif len(jogada) == 5:
             # Verificar se há uma jogada para vencer ou bloquear
-            posicao = possibilidades(tabuleiro, simbolo, "X")
+            posicao = possibilidades(tabuleiro, simbolo, oponente)
 
             if posicao != -1:
                 tabuleiro[posicao] = simbolo
@@ -692,7 +693,7 @@ def maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X"):
         # Oitava jogada
         elif len(jogada) == 7:
             # Verificar se há uma jogada para vencer ou bloquear
-            posicao = possibilidades(tabuleiro, simbolo, "X")
+            posicao = possibilidades(tabuleiro, simbolo, oponente)
 
             if posicao != -1:
                 tabuleiro[posicao] = simbolo
@@ -709,34 +710,33 @@ def maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X"):
 def agenteInteligente(tabuleiro, jogada, BD, jogadasAgenteI, simbolo):
 
     melhor_jogada = None
-    maior_valor = 0
-
+    maior_valor = float('-inf')
     for registro in BD:
 
         # Compara o tabuleiro no BD com o tabuleiro passado como referência
-        if (registro["tabuleiro"] == tabuleiro):
+        if(registro["tabuleiro"] == tabuleiro):
 
             # Encontrar o maior valor em ranked
             ranked = registro["ranked"]
-            maior_valor = max(ranked)
 
             # Percorre todas as posições do tabuleiro e ranked
             for posicao, valor_ranked in enumerate(ranked):
 
                 # Verifica se a posição está vazia no tabuleiro e se o valor é igual ao maior valor
-                if (tabuleiro[posicao] == "" and valor_ranked == maior_valor):
-
+                if(tabuleiro[posicao] == "" and valor_ranked > maior_valor):
+                    
                     melhor_jogada = posicao
+                    maior_valor = valor_ranked
 
-    if (melhor_jogada is None):
+    if(melhor_jogada is None):
 
         ranked = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
         while True:
 
-            melhor_jogada = random.randint(0, 8)
+            melhor_jogada = random.randint(0,8)
 
-            if (tabuleiro[melhor_jogada] == ""):
+            if(tabuleiro[melhor_jogada] == ""):
                 break
 
     jogadaIA = {
@@ -751,8 +751,12 @@ def agenteInteligente(tabuleiro, jogada, BD, jogadasAgenteI, simbolo):
 
     #print("\nJogada AgenteInteligente: ", jogadasAgenteI)
 
+
     tabuleiro[melhor_jogada] = simbolo
     jogada.append(melhor_jogada)
+
+
+    
 
 
 def mostrar_grafico_linhas(vitorias_jogador1, vitorias_jogador2, velhas,
@@ -838,16 +842,17 @@ jogada = []  # Todas as jogadas feitas
 ganhador = 0
 quantPartidas = 0  # quantidade de partidas que o simulador vai rodar
 quantRodadas = 0  # quantidade de rodadas do simulador
-resultados = [
-    0, 0, 0
-]  # 1° jogador / 2° jogador 2 ou maquina boba / 3° maquina profissional
+resultados = [0, 0, 0]  # 1° jogador / 2° jogador 2 ou maquina boba / 3° maquina profissional
 salvar = ""
+salvarBanco = ""
 
 jogadasAgenteI = []
+ultimaDerrota = 0
 
 # Lendo o dicionário do arquivo .txt
 with open('banco_conhecimento.txt', 'r') as arquivo:
     bancoDados = json.load(arquivo)
+
 
 # Loop para saber se o jogador quer continuar
 while True:
@@ -908,16 +913,14 @@ while True:
 
             maquinaProf(tabuleiro, jogada, quemComeca, simbolo="O")
 
-    elif (modoJogo == 4):
+    elif(modoJogo == 4):
         menuSimulacoes()
 
         modoSimulacao = int(input("\nEscolha a simulação: "))
 
         if (modoSimulacao == 2):
             quemComeca = int(
-                input(
-                    "\nQuem deve começar?\n1= Computador Aleatório\n2= Computador Profissional\n"
-                ))
+                input("\nQuem deve começar?\n1= Computador Aleatório\n2= Computador Profissional\n"))
 
         salvar = str(
             input(
@@ -925,27 +928,22 @@ while True:
             )).strip().upper()[0]
 
         quantPartidas = int(input("\nQuer simular quantas partidas: "))
-
+    
     else:
         menuAgenteI()
 
         modoSimulacao = int(input("\nEscolha a simulação: "))
 
-        if (modoSimulacao == 1):
-            quemComeca = int(
-                input(
-                    "\nQuem deve começar?\n1= Agente Inteligente\n2= Computador Aleatório\n"
-                ))
+        if(modoSimulacao == 1):
+            quemComeca = int(input("\nQuem deve começar?\n1= Agente Inteligente\n2= Computador Aleatório\n"))
 
-        elif (modoSimulacao == 1):
-            quemComeca = int(
-                input(
-                    "\nQuem deve começar?\n1= Agente Inteligente\n2= Computador Profissional\n"
-                ))
+        elif(modoSimulacao == 2):
+            quemComeca = int(input("\nQuem deve começar?\n1= Agente Inteligente\n2= Computador Profissional\n"))
 
-        #salvar = str(input('\nQuer Salvar os dados em um arquivo excel e mostrar o grafico na tela [S/N]: ')).strip().upper()[0]
+        salvar = str(input('\nQuer Salvar os dados em um arquivo excel e mostrar o grafico na tela [S/N]: ')).strip().upper()[0]
 
         quantPartidas = int(input("\nQuer simular quantas partidas: "))
+
 
     # loop do jogo
     if (modoJogo != 4 and modoJogo != 5):
@@ -1039,14 +1037,12 @@ while True:
 
                 break
 
-    elif (modoJogo == 4):
+    elif(modoJogo == 4):
 
         # Listas para gráficos
         vitorias_jogador1 = []
         vitorias_jogador2 = []
         velhas = []
-        todosTabuleiro = []
-        totalJogadas = []
 
         if (modoSimulacao == 1):
 
@@ -1095,8 +1091,6 @@ while True:
                         vitorias_jogador1.append(resultados[0])
                         vitorias_jogador2.append(resultados[1])
                         velhas.append(resultados[2])
-                        todosTabuleiro.append(tabuleiro)
-                        totalJogadas.append(jogada)
 
                     quantRodadas += 1
                     limparTabuleiro(tabuleiro)
@@ -1186,8 +1180,6 @@ while True:
                         vitorias_jogador1.append(resultados[0])
                         vitorias_jogador2.append(resultados[1])
                         velhas.append(resultados[2])
-                        todosTabuleiro.append(tabuleiro)
-                        totalJogadas.append(jogada)
 
                     quantRodadas += 1
                     limparTabuleiro(tabuleiro)
@@ -1255,8 +1247,6 @@ while True:
                         vitorias_jogador1.append(resultados[0])
                         vitorias_jogador2.append(resultados[1])
                         velhas.append(resultados[2])
-                        todosTabuleiro.append(tabuleiro)
-                        totalJogadas.append(jogada)
 
                     quantRodadas += 1
                     limparTabuleiro(tabuleiro)
@@ -1278,63 +1268,54 @@ while True:
         todosTabuleiro = []
         totalJogadas = []
 
-        if (modoSimulacao == 1):
+        if(modoSimulacao == 1):
 
             while quantRodadas < quantPartidas:
 
                 #exibirTabuleiro(tabuleiro)
-                if (quemComeca == 1):
+                if(quemComeca == 1):
 
-                    if (ganhador == 0 and len(jogada) < 9):
+                    if(ganhador == 0 and len(jogada) < 9):
 
-                        agenteInteligente(tabuleiro,
-                                          jogada,
-                                          bancoDados,
-                                          jogadasAgenteI,
-                                          simbolo="O")
+                        agenteInteligente(tabuleiro, jogada, bancoDados, jogadasAgenteI, simbolo="O")
 
                         #print(jogadasAgenteI)
                         ganhador = verificaGanhador(tabuleiro)
 
-                    if (ganhador == 0 and len(jogada) < 9):
+                    if(ganhador == 0 and len(jogada) < 9):
 
                         #print("\nJogada do computador Aleatório 1:", end=" ")
                         while True:
 
-                            computador1 = maquina(tabuleiro,
-                                                  jogada,
-                                                  simbolo="X")
+                            computador1 = maquina(tabuleiro, jogada, simbolo="X")
 
                             if (computador1):
                                 break
 
                         ganhador = verificaGanhador(tabuleiro)
 
+                
                 else:
 
-                    if (ganhador == 0 and len(jogada) < 9):
+                    if(ganhador == 0 and len(jogada) < 9):
 
                         #print("\nJogada do computador Aleatório 1:", end=" ")
                         while True:
 
-                            computador1 = maquina(tabuleiro,
-                                                  jogada,
-                                                  simbolo="X")
+                            computador1 = maquina(tabuleiro, jogada, simbolo="X")
 
                             if (computador1):
                                 break
 
                         ganhador = verificaGanhador(tabuleiro)
 
-                    if (ganhador == 0 and len(jogada) < 9):
+                    
+                    if(ganhador == 0 and len(jogada) < 9):
 
-                        agenteInteligente(tabuleiro,
-                                          jogada,
-                                          bancoDados,
-                                          jogadasAgenteI,
-                                          simbolo="O")
+                        agenteInteligente(tabuleiro, jogada, bancoDados, jogadasAgenteI, simbolo="O")
 
                         ganhador = verificaGanhador(tabuleiro)
+
 
                 if (len(jogada) > 8 or ganhador != 0):
 
@@ -1342,6 +1323,7 @@ while True:
 
                     if (ganhador == 1):
                         resultados[0] += 1
+                        ultimaDerrota = quantRodadas
 
                     elif (ganhador == 2):
                         resultados[1] += 1
@@ -1359,29 +1341,29 @@ while True:
                     # Atualizando dados do Agente Inteligente
                     for registro in jogadasAgenteI:
 
-                        if (ganhador == 1):
-                            registro["ranked"][registro["jogada"]] -= 1
+                        if(ganhador == 1):
+                            registro["ranked"][registro["jogada"]] -= 10
 
-                        elif (ganhador == 2):
-                            registro["ranked"][registro["jogada"]] += 1
+                        elif(ganhador == 2):
+                            registro["ranked"][registro["jogada"]] += 4
 
-                        #else:
-                        #registro["ranked"][registro["jogada"]] -= 2
-
+                        else:
+                            registro["ranked"][registro["jogada"]] += 2
+                    
                     # Percorre cada IA em jogadasAgenteI
                     for IA in jogadasAgenteI:
 
                         tabuleiro_IA = IA["tabuleiro"]
                         ranked_IA = IA["ranked"]
-
+                        
                         # Flag para verificar se o tabuleiro foi encontrado
                         encontrado = False
-
+                        
                         # Percorre cada registro no banco de dados
                         for registro in bancoDados:
 
                             # Compara o tabuleiro do banco de dados com o tabuleiro da IA
-                            if (registro["tabuleiro"] == tabuleiro_IA):
+                            if(registro["tabuleiro"] == tabuleiro_IA):
 
                                 # Se forem iguais, atualiza o ranked do banco de dados
                                 registro["ranked"] = ranked_IA
@@ -1390,12 +1372,11 @@ while True:
                                 break  # Sai do loop se o tabuleiro for encontrado
 
                         # Se o tabuleiro não for encontrado, adiciona novo registro ao banco de dados
-                        if (not encontrado):
+                        if(not encontrado):
 
-                            bancoDados.append({
-                                "tabuleiro": tabuleiro_IA,
-                                "ranked": ranked_IA
-                            })
+                            bancoDados.append({"tabuleiro": tabuleiro_IA, "ranked": ranked_IA})
+
+
 
                     quantRodadas += 1
                     limparTabuleiro(tabuleiro)
@@ -1407,6 +1388,123 @@ while True:
             print("Computador Aleatório ganhou", resultados[0], "vez(es)")
             print("Agente Inteligente ganhou", resultados[1], "vez(es)")
             print("Deu Velha", resultados[2], "vez(es)")
+            print("\núltima derrota foi na partida: ", ultimaDerrota, "°")
+
+        elif(modoSimulacao == 2):
+             
+            while quantRodadas < quantPartidas:
+
+                #exibirTabuleiro(tabuleiro)
+                if(quemComeca == 1):
+
+                    if(ganhador == 0 and len(jogada) < 9):
+
+                        agenteInteligente(tabuleiro, jogada, bancoDados, jogadasAgenteI, simbolo="O")
+
+                        #print(jogadasAgenteI)
+                        ganhador = verificaGanhador(tabuleiro)
+
+                    if(ganhador == 0 and len(jogada) < 9):
+
+                        #print("\nJogada do computador Aleatório 1:", end=" ")
+
+                        computador1 = maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X")
+
+                        ganhador = verificaGanhador(tabuleiro)
+
+            
+                else:
+
+                    if(ganhador == 0 and len(jogada) < 9):
+
+                        #print("\nJogada do computador Aleatório 1:", end=" ")
+
+                        computador1 = maquinaProf(tabuleiro, jogada, quemComeca, simbolo="X")
+
+                        ganhador = verificaGanhador(tabuleiro)
+
+                    
+                    if(ganhador == 0 and len(jogada) < 9):
+
+                        agenteInteligente(tabuleiro, jogada, bancoDados, jogadasAgenteI, simbolo="O")
+
+                        ganhador = verificaGanhador(tabuleiro)
+
+
+                if (len(jogada) > 8 or ganhador != 0):
+
+                    #exibirTabuleiro(tabuleiro)
+
+                    if (ganhador == 1):
+                        resultados[0] += 1
+                        ultimaDerrota = quantRodadas
+
+                    elif (ganhador == 2):
+                        resultados[1] += 1
+
+                    else:
+                        resultados[2] += 1
+
+                    if (salvar == "S"):
+                        vitorias_jogador1.append(resultados[0])
+                        vitorias_jogador2.append(resultados[1])
+                        velhas.append(resultados[2])
+                        todosTabuleiro.append(list(tabuleiro))
+                        totalJogadas.append(list(jogada))
+
+                    # Atualizando dados do Agente Inteligente
+                    for registro in jogadasAgenteI:
+
+                        if(ganhador == 1):
+                            registro["ranked"][registro["jogada"]] -= 10
+
+                        elif(ganhador == 2):
+                            registro["ranked"][registro["jogada"]] += 4
+
+                        else:
+                            registro["ranked"][registro["jogada"]] += 2
+                    
+                    # Percorre cada IA em jogadasAgenteI
+                    for IA in jogadasAgenteI:
+
+                        tabuleiro_IA = IA["tabuleiro"]
+                        ranked_IA = IA["ranked"]
+                        
+                        # Flag para verificar se o tabuleiro foi encontrado
+                        encontrado = False
+                        
+                        # Percorre cada registro no banco de dados
+                        for registro in bancoDados:
+
+                            # Compara o tabuleiro do banco de dados com o tabuleiro da IA
+                            if(registro["tabuleiro"] == tabuleiro_IA):
+
+                                # Se forem iguais, atualiza o ranked do banco de dados
+                                registro["ranked"] = ranked_IA
+                                encontrado = True
+
+                                break  # Sai do loop se o tabuleiro for encontrado
+
+                        # Se o tabuleiro não for encontrado, adiciona novo registro ao banco de dados
+                        if(not encontrado):
+
+                            bancoDados.append({"tabuleiro": tabuleiro_IA, "ranked": ranked_IA})
+
+
+                    quantRodadas += 1
+                    limparTabuleiro(tabuleiro)
+                    jogadasAgenteI.clear()
+                    jogada.clear()  # Limpa a lista de jogadas
+                    ganhador = 0
+
+            print("\n\n")
+            print("Computador Profissional ganhou", resultados[0], "vez(es)")
+            print("Agente Inteligente ganhou", resultados[1], "vez(es)")
+            print("Deu Velha", resultados[2], "vez(es)")
+            print("\núltima derrota foi na partida: ", ultimaDerrota, "°")
+            print("\nTamanho do banco de dados: ", len(bancoDados))
+
+        salvarBanco = str(input('\nQuer Salvar os dados do banco em um arquivo txt [S/N]: ')).strip().upper()[0]
 
     if (salvar == "S"):
 
@@ -1441,6 +1539,21 @@ while True:
             jogador1 = 'Computador Aleatório'
             jogador2 = 'Agente Inteligente'
 
+        elif (modoJogo == 5 and modoSimulacao == 1 and quemComeca == 2):
+            arquivo_excel = 'resultado_Aleatorio_Comecando_VS_AgenteI.xlsx'
+            jogador1 = 'Computador Aleatório'
+            jogador2 = 'Agente Inteligente'
+
+        elif (modoJogo == 5 and modoSimulacao == 2 and quemComeca == 1):
+            arquivo_excel = 'resultado_AgenteI_Comecando_VS_Profissional.xlsx'
+            jogador1 = 'Computador Aleatório'
+            jogador2 = 'Agente Inteligente'
+
+        elif (modoJogo == 5 and modoSimulacao == 2 and quemComeca == 2):
+            arquivo_excel = 'resultado_Profissional_Comecando_VS_AgenteI.xlsx'
+            jogador1 = 'Computador Aleatório'
+            jogador2 = 'Agente Inteligente'
+
         # Adicionar os resultados no formato desejado
         for i in range(len(vitorias_jogador1)):  # Loop para preencher os dados
             dadosArquivos.append({
@@ -1455,12 +1568,12 @@ while True:
 
         # Criar o DataFrame com colunas nomeadas
         df_dadosArquivos = pd.DataFrame(dadosArquivos,
-                                        columns=[
-                                            'Jogador 1', 'Vitorias Jogador 1',
-                                            'Jogador 2', 'Vitorias Jogador 2',
-                                            'Velhas', 'Tabuleiro Final',
-                                            'Todas Jogadas'
-                                        ])
+            columns=[
+                'Jogador 1', 'Vitorias Jogador 1',
+                'Jogador 2', 'Vitorias Jogador 2',
+                'Velhas', 'Tabuleiro Final',
+                'Todas Jogadas'
+            ])
 
         # Salvar o DataFrame no arquivo Excel
         df_dadosArquivos.to_excel(arquivo_excel, index=False)
@@ -1468,9 +1581,10 @@ while True:
         mostrar_grafico_linhas(vitorias_jogador1, vitorias_jogador2, velhas,
                                quantPartidas)
 
-    # Salvando o dicionário em um arquivo .txt
-    with open('banco_conhecimento.txt', 'w') as arquivo:
-        json.dump(bancoDados, arquivo)
+    if(salvarBanco == "S"):
+        # Salvando o dicionário em um arquivo .txt
+        with open('banco_conhecimento.txt', 'w') as arquivo:
+            json.dump(bancoDados, arquivo)
 
     continuar = str(input('\nQuer jogar novamente [S/N]: ')).strip().upper()[0]
 
