@@ -62,6 +62,7 @@ def menuAgenteI():
     print("=" * 20)
     print("1 - Agente Inteligente VS Computador Aleatório")
     print("2 - Agente Inteligente VS Computador Profissional")
+    print("3 - Agente Inteligente VS Agente Inteligente")
     print("=" * 56)
 
 # Função para a jogada de um jogador
@@ -1503,6 +1504,105 @@ while True:
             print("Deu Velha", resultados[2], "vez(es)")
             print("\núltima derrota foi na partida: ", ultimaDerrota, "°")
             print("\nTamanho do banco de dados: ", len(bancoDados))
+
+
+        else:
+
+            while quantRodadas < quantPartidas:
+
+                #exibirTabuleiro(tabuleiro)
+
+                if(ganhador == 0 and len(jogada) < 9):
+
+                    agenteInteligente(tabuleiro, jogada, bancoDados, jogadasAgenteI, simbolo="X")
+
+                    #print(jogadasAgenteI)
+                    ganhador = verificaGanhador(tabuleiro)
+
+                if(ganhador == 0 and len(jogada) < 9):
+
+                    #print("\nJogada do computador Aleatório 1:", end=" ")
+
+                    agenteInteligente(tabuleiro, jogada, bancoDados, jogadasAgenteI, simbolo="O")
+
+                    ganhador = verificaGanhador(tabuleiro)
+
+
+
+                if (len(jogada) > 8 or ganhador != 0):
+
+                    #exibirTabuleiro(tabuleiro)
+
+                    if (ganhador == 1):
+                        resultados[0] += 1
+                        ultimaDerrota = quantRodadas
+
+                    elif (ganhador == 2):
+                        resultados[1] += 1
+                        ultimaDerrota = quantRodadas
+
+                    else:
+                        resultados[2] += 1
+
+                    if (salvar == "S"):
+                        vitorias_jogador1.append(resultados[0])
+                        vitorias_jogador2.append(resultados[1])
+                        velhas.append(resultados[2])
+                        todosTabuleiro.append(list(tabuleiro))
+                        totalJogadas.append(list(jogada))
+
+                    # Atualizando dados do Agente Inteligente
+                    for registro in jogadasAgenteI:
+
+                        if(ganhador == 1):
+                            registro["ranked"][registro["jogada"]] -= 10
+
+                        elif(ganhador == 2):
+                            registro["ranked"][registro["jogada"]] += 4
+
+                        else:
+                            registro["ranked"][registro["jogada"]] += 2
+                    
+                    # Percorre cada IA em jogadasAgenteI
+                    for IA in jogadasAgenteI:
+
+                        tabuleiro_IA = IA["tabuleiro"]
+                        ranked_IA = IA["ranked"]
+                        
+                        # Flag para verificar se o tabuleiro foi encontrado
+                        encontrado = False
+                        
+                        # Percorre cada registro no banco de dados
+                        for registro in bancoDados:
+
+                            # Compara o tabuleiro do banco de dados com o tabuleiro da IA
+                            if(registro["tabuleiro"] == tabuleiro_IA):
+
+                                # Se forem iguais, atualiza o ranked do banco de dados
+                                registro["ranked"] = ranked_IA
+                                encontrado = True
+
+                                break  # Sai do loop se o tabuleiro for encontrado
+
+                        # Se o tabuleiro não for encontrado, adiciona novo registro ao banco de dados
+                        if(not encontrado):
+
+                            bancoDados.append({"tabuleiro": tabuleiro_IA, "ranked": ranked_IA})
+
+
+                    quantRodadas += 1
+                    limparTabuleiro(tabuleiro)
+                    jogadasAgenteI.clear()
+                    jogada.clear()  # Limpa a lista de jogadas
+                    ganhador = 0
+
+            print("\n\n")
+            print("Agente Inteligente 1 ganhou", resultados[0], "vez(es)")
+            print("Agente Inteligente 2 ganhou", resultados[1], "vez(es)")
+            print("Deu Velha", resultados[2], "vez(es)")
+            print("\núltima derrota foi na partida: ", ultimaDerrota, "°")
+            print("\nTamanho do banco de dados: ", len(bancoDados))
+
 
         salvarBanco = str(input('\nQuer Salvar os dados do banco em um arquivo txt [S/N]: ')).strip().upper()[0]
 
